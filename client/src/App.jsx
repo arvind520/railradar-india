@@ -1,5 +1,6 @@
 import { useState } from 'react'
-
+import Header from './components/Header'
+import LocationStatus from './components/LocationStatus'
 function App() {
   const [message, setMessage] = useState('Location not enabled')
   const [location, setLocation] = useState(null)
@@ -27,18 +28,11 @@ function App() {
 
   return (
     <div>
-      <h1>🚆 RailRadar India</h1>
+      <Header />
 
       <p>Discover Indian trains around your location.</p>
 
-      <p>{message}</p>
-
-      {location && (
-        <div>
-          <p>Latitude: {location.latitude}</p>
-          <p>Longitude: {location.longitude}</p>
-        </div>
-      )}
+      <LocationStatus message={message} location={location} />
 
       <button onClick={handleLocationClick}>
         Allow Location
