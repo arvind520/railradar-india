@@ -1,41 +1,56 @@
+
 import { useState } from 'react'
 import Header from './components/Header'
 import LocationCard from './components/LocationCard'
 import TrainMap from './components/TrainMap'
+import './App.css'
+
 function App() {
+  // Store the status message shown to the user.
   const [message, setMessage] = useState('Location not enabled')
+
+  // Store coordinates and the browser's estimated accuracy.
   const [location, setLocation] = useState(null)
+
+  // Track whether the browser is currently finding the location.
   const [loading, setLoading] = useState(false)
 
+  // Warn when the estimated accuracy radius is greater than 1 km.
+  const accuracyWarning =
+    location !== null && location.accuracy > 1000
+
   function handleLocationClick() {
-    // Show a loading message while the browser finds your location.
+    // Show loading feedback while the browser gets the location.
     setLoading(true)
-    setMessage('Finding your precise location...')
-  
-    // Ask the browser for the device's current location.
+    setMessage('Finding your location...')
+
+    // Request the current position from the browser.
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        // Read the coordinates returned by the browser.
+        // Extract the returned coordinates.
         const latitude = position.coords.latitude
         const longitude = position.coords.longitude
-  
-        // The estimated horizontal accuracy, in meters.
+
+        // Accuracy is an estimated radius in meters.
         const accuracy = position.coords.accuracy
-  
-        // Save the coordinates so the map can update its marker and center.
+
+        // Save all location details in React state.
         setLocation({
           latitude,
           longitude,
+          accuracy,
         })
-  
-        // Display the estimated accuracy for testing.
-        setMessage(`Location found! Accuracy: ${Math.round(accuracy)} meters`)
-  
-        // Stop the loading state after receiving the location.
+
+        // Show a warning-friendly status message.
+        setMessage(
+          `Location found. Estimated accuracy: ${Math.round(accuracy)} m`
+        )
+
+        // Finish the loading state.
         setLoading(false)
       },
       (error) => {
-        // Display a helpful message depending on the geolocation error.
+        // Give the user a useful message for each common error.
         if (error.code === 1) {
           setMessage('Location permission denied. Please allow access.')
         } else if (error.code === 2) {
@@ -45,32 +60,63 @@ function App() {
         } else {
           setMessage('Unable to get your location.')
         }
-  
-        // Stop the loading state when the request fails.
+
+        // Finish loading when the request fails.
         setLoading(false)
       },
       {
-        // Prioritize a more accurate location when the device supports it.
+        // Ask the device to prioritize a more accurate position.
         enableHighAccuracy: true,
-  
-        // Give the browser up to 15 seconds to obtain a location.
+
+        // Allow up to 15 seconds for the location request.
         timeout: 15000,
-  
-        // Avoid reusing a cached position.
+
+        // Do not accept an old cached location.
         maximumAge: 0,
       }
     )
   }
 
+  // Keep this array empty until real train data is available.
+  // Later, the backend can provide the train coordinates and details.
+  const trains = []
+
   return (
-    <div>
+    <div className="app">
       <Header />
 
-      <p>Discover Indian trains around your location.</p>
-      <LocationCard message={message} location={location} onLocationClick={handleLocationClick} loading={loading}/>
+      <main className="app-main">
+        <p className="app-intro">
+          Discover Indian trains around your location.
+        </p>
 
-      <TrainMap location={location} />
-    </div> 
+        {/* Let the user request their current location. */}
+        <LocationCard
+          message={message}
+          location={location}
+          onLocationClick={handleLocationClick}
+          loading={loading}
+        />
+
+        {/* Warn when the reported location is too approximate. */}
+        {accuracyWarning && (
+          <div className="accuracy-warning" role="alert">
+            <strong>Location may be inaccurate</strong>
+            <p>
+              Your device reports an accuracy radius of about{' '}
+              {Math.round(location.accuracy)} meters.
+              Move to an area with a better location signal and try again.
+            </p>
+          </div>
+        )}
+
+        {/* Show the map and provide train data for its marker layer. */}
+        <section className="map-section">
+          <h2>Map view</h2>
+          <TrainMap location={location} trains={trains} />
+        </section>
+      </main>
+    </div>
   )
 }
 

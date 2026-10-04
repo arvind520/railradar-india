@@ -1,3 +1,77 @@
+
+/* Give the app a consistent box-sizing model. */
+* {
+  box-sizing: border-box;
+}
+
+/* Keep the main app within the available screen width. */
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Center the content and limit its width on large screens. */
+.app-main {
+  width: min(100% - 32px, 1200px);
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+/* Add breathing room around the introductory text. */
+.app-intro {
+  margin-bottom: 20px;
+}
+
+/* Separate the map from the content above it. */
+.map-section {
+  margin-top: 28px;
+}
+
+/* Make the map fill its container with a responsive height. */
+.train-map {
+  width: 100%;
+  height: clamp(300px, 55vh, 600px);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Style the warning shown for an approximate location. */
+.accuracy-warning {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e5b64b;
+  border-radius: 8px;
+  background: #fff8e6;
+  color: #754c00;
+}
+
+/* Remove extra space below the warning text. */
+.accuracy-warning p {
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+/* Adjust spacing for smaller mobile screens. */
+@media (max-width: 600px) {
+  .app-main {
+    width: calc(100% - 24px);
+    padding: 16px 0;
+  }
+
+  .train-map {
+    height: 55vh;
+    min-height: 280px;
+    max-height: 450px;
+    border-radius: 8px;
+  }
+
+  .map-section {
+    margin-top: 20px;
+  }
+}
+
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
